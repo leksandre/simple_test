@@ -12,16 +12,29 @@ Pool find_diff(const Pool& old_pool, const Pool& new_pool)
     Pool result;
 
     for (const auto& old_range : old_pool) {
+
+
+        bool intersected = false;
         bool found = false;
 
-        for (const auto& new_range : new_pool) {
+        for (const auto &new_range: new_pool) {
             if (old_range.first >= new_range.first && old_range.second <= new_range.second) {
                 found = true;
                 break;
             }
+            if (old_range.first <= new_range.second && old_range.second >= new_range.first) {
+                intersected = true;
+                if (old_range.first < new_range.first) {
+                    result.insert({old_range.first, new_range.first - 1});
+                }
+                if (old_range.second > new_range.second) {
+                    result.insert({new_range.second + 1, old_range.second});
+                }
+                break;
+            }
         }
 
-        if (!found) {
+        if (!intersected && !found) {
             result.insert(old_range);
         }
     }
